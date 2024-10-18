@@ -15,8 +15,9 @@ public class Shoot : MonoBehaviour
     Image crosshair;
     ParticleSystem efektVystrelu;
     AudioSource audioSource;
-    int ammo = 30;
+    public int ammo = 30;
     public TMP_Text text;
+    bool reloading;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +31,12 @@ public class Shoot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetAxis("Mouse ScrollWheel") != 0)
+        {
+            objectwithAnim = GameObject.FindGameObjectWithTag("Animobject").GetComponent<Animator>();
+            efektVystrelu = GameObject.FindGameObjectWithTag("EffectShoot").GetComponent<ParticleSystem>();
+        }
+
         if (Input.GetMouseButtonDown(0) && !objectwithAnim.GetBool("Run") && !objectwithAnim.GetBool("Holster") && !objectwithAnim.GetCurrentAnimatorStateInfo(0).IsName("Inspect") && ammo > 0)
         {
             InvokeRepeating("ShootBullet", 0, 0.25f);
@@ -56,9 +63,7 @@ public class Shoot : MonoBehaviour
 
         if (Input.GetKey(KeyCode.R))
         {
-            objectwithAnim.SetTrigger("Reload");
-            ammo = 30;
-            text.text = ammo + " / 30";
+            StartCoroutine(Reload());
         }
     }
 
@@ -89,5 +94,36 @@ public class Shoot : MonoBehaviour
             ammo--;
             text.text = ammo + " / 30";
         }
+        else
+        {
+            CancelInvoke("ShootBullet");
+        }
     }
+
+    IEnumerator Reload()
+    {
+        if (reloading != true)
+        {
+            reloading = true;
+
+            if (ammo > 0)
+            {
+                objectwithAnim.SetTrigger("Reload");
+                yield return new WaitUntil(() => objectwithAnim.GetCurrentAnimatorStateInfo(0).IsName("Reload Ammo Left"));
+                yield return new WaitUntil(() => !objectwithAnim.GetCurrentAnimatorStateInfo(0).IsName("Reload Ammo Left"));
+                ammo = 30;
+            }
+            if (ammo == 0)
+            {
+                objectwithAnim.SetTrigger("ReloadEmpty");
+                yield return new WaitUntil(() => objectwithAnim.GetCurrentAnimatorStateInfo(0).IsName("Reload Out Of Ammo"));
+                yield return new WaitUntil(() => !objectwithAnim.GetCurrentAnimatorStateInfo(0).IsName("Reload Out Of Ammo"));
+                ammo = 30;
+            }
+
+        }
+        text.text = ammo.ToString() + "/" + 30.ToString();
+        reloading = false;
+    }
+
 }

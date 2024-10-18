@@ -12,6 +12,7 @@ TagManager:
   - EffectShoot
   - Crosshair
   - ammo
+  - AnimobjectHG
   layers:
   - Default
   - TransparentFX

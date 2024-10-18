@@ -19,6 +19,17 @@ public class Move : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKey(KeyCode.W)
+        && Input.GetKey(KeyCode.LeftShift)
+        && !objectwithAnim.GetBool("Aim")
+        && !objectwithAnim.GetCurrentAnimatorStateInfo(0).IsName("Inspect"))
+        {
+            Player.AddRelativeForce(new Vector3(0, 0, (movementSpeed + 5) * Time.deltaTime)); // Tento øádek jsme upravili
+            objectwithAnim.SetBool("Run", true);
+            running = true;
+        }
+
+
         if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftShift) && !objectwithAnim.GetBool("Aim") && !objectwithAnim.GetCurrentAnimatorStateInfo(0).IsName("Inspect"))
         {
             Player.AddRelativeForce(new Vector3(0, 0, 7));
